@@ -9,6 +9,10 @@
 import UIKit
 import os.log
 
+class MealNetworkManager {
+    
+}
+
 class MealTableViewController: UITableViewController {
     
     //MARK: Properties
