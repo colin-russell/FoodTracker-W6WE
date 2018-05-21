@@ -9,29 +9,129 @@
 import UIKit
 import os.log
 
+
 class MealNetworkManager {
     
+    //MARK: Properties
+    var username = "colin123"
+    var password = "1234"
+    var httpMethod = ""
+    var token = "czZ1kL3Sh6pDhfXih5HM5biN"
+    
+    func login() { // probably want to take in a username & password later
+        //let url = URL(string: "https://cloud-tracker.herokuapp.com/login")!
+        guard var url = URL(string: "https://cloud-tracker.herokuapp.com/login") else {return}
+        let URLParams = [
+            "username": "colin123",
+            "password": "1234",
+            ]
+        url = url.appendingQueryParameters(URLParams)
+        
+        httpMethod = "POST"
+        
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+            if (error == nil) {
+                // Success
+                let statusCode = (response as! HTTPURLResponse).statusCode
+                print("URL Session Task Succeeded: HTTP \(statusCode)")
+            }
+            else {
+                // Failure
+                print("URL Session Task Failed: %@", error!.localizedDescription);
+            }
+            
+            DispatchQueue.main.async {
+                let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+                print(json!)
+            }
+        })
+        task.resume()
+        session.finishTasksAndInvalidate()
+        
+    }
+    
+    func fetchAllMeals(completion: @escaping (_ meals: [Meal]?) -> Void) {
+        let url = URL(string: "https://cloud-tracker.herokuapp.com/users/me/meals")!
+        httpMethod = "GET"
+        
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
+        request.addValue("czZ1kL3Sh6pDhfXih5HM5biN", forHTTPHeaderField: "token")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+            if (error == nil) {
+                // Success
+                let statusCode = (response as! HTTPURLResponse).statusCode
+                print("URL Session Task Succeeded: HTTP \(statusCode)")
+            }
+            else {
+                // Failure
+                print("URL Session Task Failed: %@", error!.localizedDescription)
+                completion(nil)
+            }
+            
+            DispatchQueue.main.async {
+ 
+                guard let result = try! JSONSerialization.jsonObject(with: data!, options: []) as? [[String : Any]] else {
+                    print("Invalid JSON")
+                    completion(nil)
+                    return
+                }
+                
+                print("calories: \(result[0]["calories"] ?? "nil")")
+                var mealArray = [Meal]()
+                for i in 0..<result.count {
+                    let meal = Meal(name: result[i]["title"] as! String,
+                                    photo: nil,
+                                    rating: result[i]["rating"] as? Int ?? 0)
+                    mealArray.append(meal!)
+                }
+                completion(mealArray)
+            }
+        })
+        task.resume()
+        session.finishTasksAndInvalidate()
+    }
+
 }
 
 class MealTableViewController: UITableViewController {
     
     //MARK: Properties
     var meals = [Meal]()
+    let networkManager = MealNetworkManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        networkManager.fetchAllMeals { (meals) in
+            
+            DispatchQueue.main.async {
+                if meals != nil {
+                    self.meals = meals!
+                }
+                self.tableView.reloadData()
+            }
+        }
+        
         // Use the edit button item provided by the table view controller.
         navigationItem.leftBarButtonItem = editButtonItem
         
-        // Load any saved meals, otherwise load sample data.
-        if let savedMeals = loadMeals() {
-            meals += savedMeals
-        }
-        else {
-            // Load the sample data.
-            loadSampleMeals()
-        }
+//        // Load any saved meals, otherwise load sample data.
+//        if let savedMeals = loadMeals() {
+//            meals += savedMeals
+//        }
+//        else {
+//            // Load the sample data.
+//            loadSampleMeals()
+//        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
