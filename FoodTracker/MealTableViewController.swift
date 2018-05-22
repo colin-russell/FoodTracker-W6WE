@@ -84,13 +84,12 @@ class MealNetworkManager {
                     completion(nil)
                     return
                 }
-                
-                print("calories: \(result[0]["calories"] ?? "nil")")
+            
                 var mealArray = [Meal]()
                 for i in 0..<result.count {
                     let meal = Meal(name: result[i]["title"] as! String,
                                     photo: nil,
-                                    rating: result[i]["rating"] as? Int ?? 0)
+                                    rating: result[i]["rating"] as? Int ?? 0, calories: result[i]["calories"] as? Int ?? 0)
                     mealArray.append(meal!)
                 }
                 completion(mealArray)
@@ -112,13 +111,10 @@ class MealTableViewController: UITableViewController {
         super.viewDidLoad()
         
         networkManager.fetchAllMeals { (meals) in
-            
-            DispatchQueue.main.async {
                 if meals != nil {
                     self.meals = meals!
                 }
                 self.tableView.reloadData()
-            }
         }
         
         // Use the edit button item provided by the table view controller.
@@ -225,25 +221,25 @@ class MealTableViewController: UITableViewController {
     
     //MARK: Private Methods
     
-    private func loadSampleMeals() {
-        let photo1 = UIImage(named: "meal1")
-        let photo2 = UIImage(named: "meal2")
-        let photo3 = UIImage(named: "meal3")
-        
-        guard let meal1 = Meal(name: "Caprese Salad", photo: photo1, rating: 5) else {
-            fatalError("Unable to instantiate meal1")
-        }
-        
-        guard let meal2 = Meal(name: "Spaghetti and Meatballs", photo: photo2, rating: 4) else {
-            fatalError("Unable to instantiate meal2")
-        }
-        
-        guard let meal3 = Meal(name: "Pizza", photo: photo3, rating: 3) else {
-            fatalError("Unable to instantiate meal2")
-        }
-        
-        meals += [meal1, meal2, meal3]
-    }
+//    private func loadSampleMeals() {
+//        let photo1 = UIImage(named: "meal1")
+//        let photo2 = UIImage(named: "meal2")
+//        let photo3 = UIImage(named: "meal3")
+//        
+//        guard let meal1 = Meal(name: "Caprese Salad", photo: photo1, rating: 5) else {
+//            fatalError("Unable to instantiate meal1")
+//        }
+//        
+//        guard let meal2 = Meal(name: "Spaghetti and Meatballs", photo: photo2, rating: 4) else {
+//            fatalError("Unable to instantiate meal2")
+//        }
+//        
+//        guard let meal3 = Meal(name: "Pizza", photo: photo3, rating: 3) else {
+//            fatalError("Unable to instantiate meal2")
+//        }
+//        
+//        meals += [meal1, meal2, meal3]
+//    }
     
     private func saveMeals() {
         let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(meals, toFile: Meal.ArchiveURL.path)

@@ -16,6 +16,7 @@ class Meal: NSObject, NSCoding {
     var photo: UIImage?
     var rating: Int
     var calories: Int
+    var mealDescription: String
     
     //MARK: Archiving Paths
     
@@ -29,10 +30,11 @@ class Meal: NSObject, NSCoding {
         static let photo = "photo"
         static let rating = "rating"
         static let calories = "calories"
+        static let mealDescription = "mealDescription"
     }
     
     //MARK: Initialization
-    init?(name: String, photo: UIImage?, rating: Int, calories: Int) {
+    init?(name: String, photo: UIImage?, rating: Int, calories: Int, mealDescription: String) {
         // The name must not be empty
         guard !name.isEmpty else {
             return nil
@@ -47,6 +49,7 @@ class Meal: NSObject, NSCoding {
         self.photo = photo
         self.rating = rating
         self.calories = calories
+        self.mealDescription = mealDescription
     }
     
     //MARK: NSCoding
@@ -56,6 +59,7 @@ class Meal: NSObject, NSCoding {
         aCoder.encode(photo, forKey: PropertyKey.photo)
         aCoder.encode(rating, forKey: PropertyKey.rating)
         aCoder.encode(calories, forKey: PropertyKey.calories)
+        aCoder.encode(mealDescription, forKey: PropertyKey.mealDescription)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
@@ -73,8 +77,10 @@ class Meal: NSObject, NSCoding {
         
         let calories = aDecoder.decodeInteger(forKey: PropertyKey.calories)
         
+        let mealDescription = aDecoder.decodeObject(forKey: PropertyKey.mealDescription) as? String ?? ""
+        
         // Must call designated initializer.
-        self.init(name: name, photo: photo, rating: rating, calories: calories)
+        self.init(name: name, photo: photo, rating: rating, calories: calories, mealDescription: mealDescription)
         
     }
     
