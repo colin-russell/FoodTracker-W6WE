@@ -129,6 +129,7 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         
         // Set the meal to be passed to MealTableViewController after the unwind segue.
         meal = Meal(name: name, photo: photo, rating: rating, calories: calories, mealDescription: mealDescription, id: id)
+        
     }
     
     //MARK: Actions

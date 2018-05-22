@@ -30,7 +30,6 @@ class MealTableViewController: UITableViewController {
     }
     
     
-    
     //MARK: - Navigation
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -115,6 +114,9 @@ class MealTableViewController: UITableViewController {
             if meals != nil {
                 self.meals = meals!
             }
+            for i in 0..<meals!.count {
+                print("rating: \(self.meals[i].rating)")
+            }
             self.tableView.reloadData()
         }
     }
@@ -127,6 +129,7 @@ class MealTableViewController: UITableViewController {
                 tableView.reloadRows(at: [selectedIndexPath], with: .none)
             } else {
                 networkManager.saveMeal(meal: meal)
+                
                 tableView.reloadData()
             }
         }

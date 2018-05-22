@@ -20,12 +20,12 @@ class NetworkManager {
     let contentType = "application/json"
     
     
-    
     func saveMeal(meal: Meal) {
         
         let mealName = meal.name.replacingOccurrences(of: " ", with: "+")
         let mealDescription = meal.mealDescription.replacingOccurrences(of: " ", with: "+")
         let mealCalories = meal.calories
+        let mealRating = meal.rating
         
         httpMethod = "POST"
         guard let url = URL(string: "https://cloud-tracker.herokuapp.com/users/me/meals?title=\(mealName)&description=\(mealDescription)&calories=\(mealCalories)") else {return}
@@ -34,9 +34,9 @@ class NetworkManager {
         request.httpMethod = httpMethod
         request.addValue(token, forHTTPHeaderField: "token")
         request.addValue(contentType, forHTTPHeaderField: "Content-Type")
-        let session2 = URLSession(configuration: URLSessionConfiguration.default)
+        let session = URLSession(configuration: URLSessionConfiguration.default)
         
-        let task = session2.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+        let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
             if (error == nil) {
                 let statusCode = (response as! HTTPURLResponse).statusCode
                 print("URL Session Task Succeeded: HTTP \(statusCode)")
@@ -44,9 +44,35 @@ class NetworkManager {
             else {
                 print("URL Session Task Failed: %@", error!.localizedDescription)
             }
+            DispatchQueue.main.async {
+                guard let results = try! JSONSerialization.jsonObject(with: data!, options: []) as? [String : [String : Any]] else {
+                    print("Invalid JSON")
+                    return
+                }
+                
+                let mealID = results["meal"]?["id"] ?? ""
+                request.url = URL(string: "https://cloud-tracker.herokuapp.com/users/me/meals/\(mealID)/rate?rating=\(mealRating)")
+                let ratingSession = URLSession(configuration: URLSessionConfiguration.default)
+                
+                let ratingTask = ratingSession.dataTask(with: request, completionHandler: { (_, ratingResponse, ratingError) in
+                    if (ratingError == nil) {
+                        let statusCode = (ratingResponse as! HTTPURLResponse).statusCode
+                        print("URL Session ratingTask Succeeded: HTTP \(statusCode)")
+                    }
+                    else {
+                        print("URL Session ratingTask Failed: %@", error!.localizedDescription)
+                    }
+                })
+                ratingTask.resume()
+                ratingSession.finishTasksAndInvalidate()
+            }
         })
         task.resume()
-        session2.finishTasksAndInvalidate()
+        session.finishTasksAndInvalidate()
+    }
+    
+    func updateRating(meal: Meal) {
+        
     }
     
     func deleteMeal(meal: Meal, id: Int) {
