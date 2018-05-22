@@ -8,7 +8,6 @@
 
 import UIKit
 import os.log
-
 class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     //MARK: Properties
@@ -124,9 +123,11 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         let name = nameTextField.text ?? ""
         let photo = photoImageView.image
         let rating = ratingControl.rating
+        let calories = Int(caloriesTextField.text ?? "") ?? 0
+        let mealDescription = descriptionTextField.text ?? ""
         
         // Set the meal to be passed to MealTableViewController after the unwind segue.
-        //meal = Meal(name: name, photo: photo, rating: rating)
+        meal = Meal(name: name, photo: photo, rating: rating, calories: calories, mealDescription: mealDescription)
     }
     
     //MARK: Actions
