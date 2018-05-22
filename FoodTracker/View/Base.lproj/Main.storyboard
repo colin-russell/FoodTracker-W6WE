@@ -78,7 +78,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="5nS-51-r67">
-                                <rect key="frame" x="20" y="84" width="335" height="410"/>
+                                <rect key="frame" x="20" y="84" width="335" height="486"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter meal name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gOD-Ma-Kcf">
                                         <rect key="frame" x="0.0" y="0.0" width="335" height="30"/>
@@ -109,9 +109,22 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="kbB-Ey-ILz" customClass="RatingControl" customModule="FoodTracker" customModuleProvider="target">
                                         <rect key="frame" x="41.5" y="366" width="252" height="44"/>
                                     </stackView>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter description" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8oI-Fv-8l7">
+                                        <rect key="frame" x="0.0" y="418" width="335" height="30"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter calories" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="IxF-FV-7LA">
+                                        <rect key="frame" x="113" y="456" width="109.5" height="30"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                    </textField>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="gOD-Ma-Kcf" firstAttribute="width" secondItem="5nS-51-r67" secondAttribute="width" id="NYf-cO-QYh"/>
+                                    <constraint firstItem="8oI-Fv-8l7" firstAttribute="width" secondItem="5nS-51-r67" secondAttribute="width" id="nTx-iq-PX7"/>
                                 </constraints>
                             </stackView>
                         </subviews>
@@ -136,6 +149,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="caloriesTextField" destination="IxF-FV-7LA" id="K0l-x3-MBa"/>
+                        <outlet property="descriptionTextField" destination="8oI-Fv-8l7" id="APx-br-a3I"/>
                         <outlet property="nameTextField" destination="gOD-Ma-Kcf" id="996-Mj-tce"/>
                         <outlet property="photoImageView" destination="y6A-zN-9k8" id="AqU-un-KWo"/>
                         <outlet property="ratingControl" destination="kbB-Ey-ILz" id="vqf-UK-Mub"/>
@@ -225,6 +240,7 @@
                             <constraint firstItem="4aw-je-3Zo" firstAttribute="centerY" secondItem="H4H-Ms-WBy" secondAttribute="centerY" id="9qn-7L-GKw"/>
                             <constraint firstItem="SEO-K2-8zL" firstAttribute="trailing" secondItem="WbE-0l-FGv" secondAttribute="trailing" id="Agz-JZ-AyF"/>
                             <constraint firstItem="sO5-R2-dwW" firstAttribute="trailing" secondItem="H4H-Ms-WBy" secondAttribute="trailing" id="CaT-z6-Bvi"/>
+                            <constraint firstItem="SEO-K2-8zL" firstAttribute="leading" secondItem="yNU-w4-93K" secondAttribute="leading" constant="293" id="Ic1-Ip-rLp"/>
                             <constraint firstItem="sO5-R2-dwW" firstAttribute="leading" secondItem="yNU-w4-93K" secondAttribute="leading" constant="46" id="NNp-eE-aOK"/>
                             <constraint firstItem="4aw-je-3Zo" firstAttribute="top" secondItem="yNU-w4-93K" secondAttribute="top" constant="259" id="PrM-a5-pc3"/>
                             <constraint firstItem="yNU-w4-93K" firstAttribute="trailing" secondItem="4aw-je-3Zo" secondAttribute="trailing" constant="30" id="S66-Ib-95I"/>

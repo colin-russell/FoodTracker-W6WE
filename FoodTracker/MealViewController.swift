@@ -13,6 +13,8 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
 
     //MARK: Properties
     @IBOutlet weak var nameTextField: UITextField!
+    @IBOutlet weak var descriptionTextField: UITextField!
+    @IBOutlet weak var caloriesTextField: UITextField!
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var ratingControl: RatingControl!
     @IBOutlet weak var saveButton: UIBarButtonItem!
@@ -35,6 +37,8 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
             nameTextField.text   = meal.name
             photoImageView.image = meal.photo
             ratingControl.rating = meal.rating
+            descriptionTextField.text = meal.mealDescription
+            caloriesTextField.text = "\(meal.calories)"
         }
         
         // Enable the Save button only if the text field has a valid Meal name.

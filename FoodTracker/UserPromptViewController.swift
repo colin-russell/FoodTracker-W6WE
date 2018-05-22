@@ -35,28 +35,28 @@ class UserPromptViewController: UIViewController {
     //MARK: Actions
     @IBAction func signupButtonTapped(_ sender: UIButton) {
         //let username = usernameField.text
-        guard let username = usernameField.text else {
-            print("Empty a username")
-            return
-        }
-        guard let password = passwordField.text else {
-            print("Empty password")
-            return
-        }
+//        guard let username = usernameField.text else {
+//            print("Empty a username")
+//            return
+//        }
+//        guard let password = passwordField.text else {
+//            print("Empty password")
+//            return
+//        }
         
-        if UserDefaults.standard.value(forKeyPath: username) == nil{
-            UserDefaults.standard.set(username, forKey: "username")
-            UserDefaults.standard.set(password, forKey: "password")
-            let signupData = signupRequester.sendRequest(username: username, password: password)
-            //let json = try? JSONSerialization.jsonObject(with: signupData)
-            // get token here
-            print(signupData?.base64EncodedString())
-            UserDefaults.standard.set("", forKey: "token")
-            
-            print("User account created for username: \(username) and password \(password)")
-        } else {
-            print("User account already exists!")
-        }
+//        if UserDefaults.standard.value(forKeyPath: username) == nil{
+//            UserDefaults.standard.set(username, forKey: "username")
+//            UserDefaults.standard.set(password, forKey: "password")
+//            let signupData = signupRequester.sendRequest(username: username, password: password)
+//            //let json = try? JSONSerialization.jsonObject(with: signupData)
+//            // get token here
+//            print(signupData?.base64EncodedString())
+//            UserDefaults.standard.set("", forKey: "token")
+//
+//            print("User account created for username: \(username) and password \(password)")
+//        } else {
+//            print("User account already exists!")
+//        }
     }
     
     

@@ -6,100 +6,144 @@
 //  Copyright © 2018 Colin Russell. All rights reserved.
 //
 import UIKit
+import Foundation
 
 class NetworkManager {
     
-    func sendRequest(username: String, password: String) -> Data! {
-        /* Configure session, choose between:
-         * defaultSessionConfiguration
-         * ephemeralSessionConfiguration
-         * backgroundSessionConfigurationWithIdentifier:
-         And set session-wide properties, such as: HTTPAdditionalHeaders,
-         HTTPCookieAcceptPolicy, requestCachePolicy or timeoutIntervalForRequest.
-         */
-      
-        let sessionConfig = URLSessionConfiguration.default
-        
-        /* Create session, and optionally set a URLSessionDelegate. */
-        let session = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: nil)
-        
-        /* Create the Request:
-         signup (POST https://cloud-tracker.herokuapp.com/signup)
-         */
-        
-        guard var URL = URL(string: "https://cloud-tracker.herokuapp.com/signup") else { return Data(base64Encoded: "error", options: .ignoreUnknownCharacters) }
-        var returnData = Data()
-        
-        let URLParams = [
-            "username": username,
-            "password": password,
-            ]
-        URL = URL.appendingQueryParameters(URLParams)
-        var request = URLRequest(url: URL)
-        request.httpMethod = "POST"
-        
-        // Headers
-        
+    //MARK: Properties
+    var username = "colin123"
+    var password = "1234"
+    var httpMethod = ""
+    var token = "czZ1kL3Sh6pDhfXih5HM5biN"
+    let session = URLSession(configuration: URLSessionConfiguration.default)
+    
+//    func login() { // probably want to take in a username & password later
+//
+//        guard var url = URL(string: "https://cloud-tracker.herokuapp.com/login") else {return}
+//        let URLParams = [
+//            "username": "colin123",
+//            "password": "1234",
+//            ]
+//        url = url.appendingQueryParameters(URLParams)
+//
+//        httpMethod = "POST"
+//
+//        var request = URLRequest(url: url)
+//        request.httpMethod = httpMethod
+//        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+//
+//        let task = session.dataTask(with: URLRequest(url: url), completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+//            if (error == nil) {
+//                // Success
+//                let statusCode = (response as! HTTPURLResponse).statusCode
+//                print("URL Session Task Succeeded: HTTP \(statusCode)")
+//            }
+//            else {
+//                // Failure
+//                print("URL Session Task Failed: %@", error!.localizedDescription);
+//            }
+//
+//            DispatchQueue.main.async {
+//                let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+//                print(json!)
+//            }
+//        })
+//        task.resume()
+//        session.finishTasksAndInvalidate()
+//
+//    }
+
+    func saveMeal(completion: @escaping () -> Void) {
+        let url = URL(string: "https://cloud-tracker.herokuapp.com/users/me/meals")!
+        httpMethod = "POST"
+
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
+        request.addValue("czZ1kL3Sh6pDhfXih5HM5biN", forHTTPHeaderField: "token")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        /* Start a new Task */
+
         let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
-            let statusCode = (response as! HTTPURLResponse).statusCode
             if (error == nil) {
                 // Success
-                //let statusCode = (response as! HTTPURLResponse).statusCode
+                let statusCode = (response as! HTTPURLResponse).statusCode
                 print("URL Session Task Succeeded: HTTP \(statusCode)")
-                if statusCode == 409 {
-                    print("ERROR: User account already exists!")
-                }
             }
             else {
                 // Failure
-                print("URL Session Task Failed: %@", error!.localizedDescription);
+                print("URL Session Task Failed: %@", error!.localizedDescription)
+               // completion(nil)
             }
+
             DispatchQueue.main.async {
-                returnData = data!
+
+                guard let results = try! JSONSerialization.jsonObject(with: data!, options: []) as? [[String : Any]] else {
+                    print("Invalid JSON")
+                    //completion(nil)
+                    return
+                }
+
+                var mealArray = [Meal]()
+                for i in 0..<results.count {
+                    let mealJSON = results[i]
+                    let meal = Meal(name: mealJSON["title"] as! String,
+                                    photo: nil,
+                                    rating: mealJSON["rating"] as? Int ?? 0,
+                                    calories: mealJSON["calories"] as? Int ?? 0,
+                                    mealDescription: mealJSON["description"] as? String ?? "")
+                    mealArray.append(meal!)
+                }
+                //completion(mealArray)
             }
         })
         task.resume()
         session.finishTasksAndInvalidate()
-        return returnData
     }
-}
-
-
-protocol URLQueryParameterStringConvertible {
-    var queryParameters: String {get}
-}
-
-extension Dictionary : URLQueryParameterStringConvertible {
-    /**
-     This computed property returns a query parameters string from the given NSDictionary. For
-     example, if the input is @{@"day":@"Tuesday", @"month":@"January"}, the output
-     string will be @"day=Tuesday&month=January".
-     @return The computed parameters string.
-     */
-    var queryParameters: String {
-        var parts: [String] = []
-        for (key, value) in self {
-            let part = String(format: "%@=%@",
-                              String(describing: key).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!,
-                              String(describing: value).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)
-            parts.append(part as String)
-        }
-        return parts.joined(separator: "&")
+    
+    func fetchAllMeals(completion: @escaping (_ meals: [Meal]?) -> Void) {
+        let url = URL(string: "https://cloud-tracker.herokuapp.com/users/me/meals")!
+        httpMethod = "GET"
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
+        request.addValue("czZ1kL3Sh6pDhfXih5HM5biN", forHTTPHeaderField: "token")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+            if (error == nil) {
+                // Success
+                let statusCode = (response as! HTTPURLResponse).statusCode
+                print("URL Session Task Succeeded: HTTP \(statusCode)")
+            }
+            else {
+                // Failure
+                print("URL Session Task Failed: %@", error!.localizedDescription)
+                completion(nil)
+            }
+            
+            DispatchQueue.main.async {
+                
+                guard let results = try! JSONSerialization.jsonObject(with: data!, options: []) as? [[String : Any]] else {
+                    print("Invalid JSON")
+                    completion(nil)
+                    return
+                }
+                
+                var mealArray = [Meal]()
+                for i in 0..<results.count {
+                    let mealJSON = results[i]
+                    let meal = Meal(name: mealJSON["title"] as! String,
+                                    photo: nil,
+                                    rating: mealJSON["rating"] as? Int ?? 0,
+                                    calories: mealJSON["calories"] as? Int ?? 0,
+                                    mealDescription: mealJSON["description"] as? String ?? "")
+                    mealArray.append(meal!)
+                }
+                completion(mealArray)
+            }
+        })
+        task.resume()
+        session.finishTasksAndInvalidate()
     }
     
 }
 
-extension URL {
-    /**
-     Creates a new URL by adding the given query parameters.
-     @param parametersDictionary The query parameter dictionary to add.
-     @return A new URL.
-     */
-    func appendingQueryParameters(_ parametersDictionary : Dictionary<String, String>) -> URL {
-        let URLString : String = String(format: "%@?%@", self.absoluteString, parametersDictionary.queryParameters)
-        return URL(string: URLString)!
-    }
-}
