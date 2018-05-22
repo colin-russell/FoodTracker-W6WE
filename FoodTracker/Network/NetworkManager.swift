@@ -17,7 +17,6 @@ class NetworkManager {
     var password = "1234"
     var httpMethod = ""
     var token = "czZ1kL3Sh6pDhfXih5HM5biN"
-    let session = URLSession(configuration: URLSessionConfiguration.default)
     
     //    func login() { // probably want to take in a username & password later
     //
@@ -68,8 +67,9 @@ class NetworkManager {
         request.httpMethod = httpMethod
         request.addValue("czZ1kL3Sh6pDhfXih5HM5biN", forHTTPHeaderField: "token")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+        let session2 = URLSession(configuration: URLSessionConfiguration.default)
+
+        let task = session2.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
             if (error == nil) {
                 let statusCode = (response as! HTTPURLResponse).statusCode
                 print("URL Session Task Succeeded: HTTP \(statusCode)")
@@ -78,26 +78,26 @@ class NetworkManager {
                 print("URL Session Task Failed: %@", error!.localizedDescription)
             }
             
-            DispatchQueue.main.async {
-                guard let results = try! JSONSerialization.jsonObject(with: data!, options: []) as? [[String : Any]] else {
-                    print("Invalid JSON")
-                    return
-                }
-                
-                var mealArray = [Meal]()
-                for i in 0..<results.count {
-                    let mealJSON = results[i]
-                    let meal = Meal(name: mealJSON["title"] as! String,
-                                    photo: nil,
-                                    rating: mealJSON["rating"] as? Int ?? 0,
-                                    calories: mealJSON["calories"] as? Int ?? 0,
-                                    mealDescription: mealJSON["description"] as? String ?? "")
-                    mealArray.append(meal!)
-                }
-            }
+//            DispatchQueue.main.async {
+//                guard let results = try! JSONSerialization.jsonObject(with: data!, options: []) as? [[String : Any]] else {
+//                    print("Invalid JSON")
+//                    return
+//                }
+//
+//                var mealArray = [Meal]()
+//                for i in 0..<results.count {
+//                    let mealJSON = results[i]
+//                    let meal = Meal(name: mealJSON["title"] as! String,
+//                                    photo: nil,
+//                                    rating: mealJSON["rating"] as? Int ?? 0,
+//                                    calories: mealJSON["calories"] as? Int ?? 0,
+//                                    mealDescription: mealJSON["description"] as? String ?? "")
+//                    mealArray.append(meal!)
+//                }
+//            }
         })
         task.resume()
-        session.finishTasksAndInvalidate()
+        session2.finishTasksAndInvalidate()
     }
     
     func fetchAllMeals(completion: @escaping (_ meals: [Meal]?) -> Void) {
@@ -108,7 +108,8 @@ class NetworkManager {
         request.httpMethod = httpMethod
         request.addValue("czZ1kL3Sh6pDhfXih5HM5biN", forHTTPHeaderField: "token")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+
         let task = session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) -> Void in
             if (error == nil) {
                 // Success

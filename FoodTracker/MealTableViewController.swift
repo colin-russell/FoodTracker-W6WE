@@ -18,18 +18,15 @@ class MealTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        networkManager.fetchAllMeals { (meals) in
-            if meals != nil {
-                self.meals = meals!
-            }
-            self.tableView.reloadData()
-        }
-
     }
         
         override func viewDidAppear(_ animated: Bool) {
-            
-            // When the app launches, check if the user's credentials are saved in UserDefaults
+            networkManager.fetchAllMeals { (meals) in
+                if meals != nil {
+                    self.meals = meals!
+                }
+                self.tableView.reloadData()
+            }
         }
         
         override func didReceiveMemoryWarning() {
@@ -162,13 +159,15 @@ class MealTableViewController: UITableViewController {
                     tableView.reloadRows(at: [selectedIndexPath], with: .none)
                 } else {
                     // Add a new meal.
-                    let newIndexPath = IndexPath(row: meals.count, section: 0)
+                    //let newIndexPath = IndexPath(row: 1, section: 0)
+                    //meals.append(meal)
+                    networkManager.saveMeal(meal: meal)
+                    tableView.reloadData()
+                    //tableView.insertRows(at: [newIndexPath], with: .automatic)                     //NSInternalInconsistencyException', reason: 'attempt to insert row 2 into section 0, but there are only 2 rows in section 0 after the update'
+
                     
-                    meals.append(meal)
-                    tableView.insertRows(at: [newIndexPath], with: .automatic)
                 }
                 // Save the meals.
-                networkManager.saveMeal(meal: meal)
             }
         }
         
