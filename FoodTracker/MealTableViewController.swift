@@ -19,156 +19,117 @@ class MealTableViewController: UITableViewController {
         super.viewDidLoad()
         
     }
-        
-        override func viewDidAppear(_ animated: Bool) {
-            networkManager.fetchAllMeals { (meals) in
-                if meals != nil {
-                    self.meals = meals!
-                }
-                self.tableView.reloadData()
-            }
-        }
-        
-        override func didReceiveMemoryWarning() {
-            super.didReceiveMemoryWarning()
-            // Dispose of any resources that can be recreated.
-        }
-        
-        //MARK: - Navigation
-        
-        // In a storyboard-based application, you will often want to do a little preparation before navigation
-        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-            super.prepare(for: segue, sender: sender)
-            switch(segue.identifier ?? "") {
-            case "AddItem":
-                os_log("Adding a new meal.", log: OSLog.default, type: .debug)
-            case "ShowDetail":
-                guard let mealDetailViewController = segue.destination as? MealViewController else {
-                    fatalError("Unexpected destination: \(segue.destination)")
-                }
-                
-                guard let selectedMealCell = sender as? MealTableViewCell else {
-                    fatalError("Unexpected sender: \(sender ?? "nil")")
-                }
-                
-                guard let indexPath = tableView.indexPath(for: selectedMealCell) else {
-                    fatalError("The selected cell is not being displayed by the table")
-                }
-                
-                let selectedMeal = meals[indexPath.row]
-                mealDetailViewController.meal = selectedMeal
-                
-            default:
-                fatalError("Unexpected Segue Identifier; \(segue.identifier ?? "nil")")
-            }
-        }
-        
-        // MARK: - Table view data source
-        
-        override func numberOfSections(in tableView: UITableView) -> Int {
-            return 1
-        }
-        
-        override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            return meals.count
-        }
-        
-        override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-            return 90.0;//Choose your custom row height
-        }
-        
-        override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            // Table view cells are reused and should be dequeued using a cell identifier.
-            let cellIdentifier = "MealTableViewCell"
-            
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? MealTableViewCell  else {
-                fatalError("The dequeued cell is not an instance of MealTableViewCell.")
+    
+    override func viewDidAppear(_ animated: Bool) {
+        loadMeals()
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    
+    //MARK: - Navigation
+    
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        switch(segue.identifier ?? "") {
+        case "AddItem":
+            os_log("Adding a new meal.", log: OSLog.default, type: .debug)
+        case "ShowDetail":
+            guard let mealDetailViewController = segue.destination as? MealViewController else {
+                fatalError("Unexpected destination: \(segue.destination)")
             }
             
-            // Fetches the appropriate meal for the data source layout.
-            let meal = meals[indexPath.row]
-            
-            cell.nameLabel.text = meal.name
-            cell.photoImageView.image = meal.photo
-            cell.ratingControl.rating = meal.rating
-            
-            return cell
-        }
-        
-        // Override to support editing the table view.
-        override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-            if editingStyle == .delete {
-                // Delete the row from the data source
-                //meals.remove(at: indexPath.row)
-                //saveMeals()
-                tableView.deleteRows(at: [indexPath], with: .fade)
-            } else if editingStyle == .insert {
-                // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+            guard let selectedMealCell = sender as? MealTableViewCell else {
+                fatalError("Unexpected sender: \(sender ?? "nil")")
             }
+            
+            guard let indexPath = tableView.indexPath(for: selectedMealCell) else {
+                fatalError("The selected cell is not being displayed by the table")
+            }
+            
+            let selectedMeal = meals[indexPath.row]
+            mealDetailViewController.meal = selectedMeal
+            
+        default:
+            fatalError("Unexpected Segue Identifier; \(segue.identifier ?? "nil")")
+        }
+    }
+    
+    // MARK: - Table view data source
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return meals.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90.0;//Choose your custom row height
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Table view cells are reused and should be dequeued using a cell identifier.
+        let cellIdentifier = "MealTableViewCell"
+        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? MealTableViewCell  else {
+            fatalError("The dequeued cell is not an instance of MealTableViewCell.")
         }
         
-        // Override to support conditional editing of the table view.
-        override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-            // Return false if you do not want the specified item to be editable.
-            return true
+        // Fetches the appropriate meal for the data source layout.
+        let meal = meals[indexPath.row]
+        
+        cell.nameLabel.text = meal.name
+        cell.photoImageView.image = meal.photo
+        cell.ratingControl.rating = meal.rating
+        
+        return cell
+    }
+    
+    // Override to support editing the table view.
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            networkManager.deleteMeal(meal: meals[indexPath.row], id: meals[indexPath.row].id)
+           loadMeals()
+        } else if editingStyle == .insert {
+            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
-        
-        //MARK: Private Methods
-        
-        //    private func loadSampleMeals() {
-        //        let photo1 = UIImage(named: "meal1")
-        //        let photo2 = UIImage(named: "meal2")
-        //        let photo3 = UIImage(named: "meal3")
-        //
-        //        guard let meal1 = Meal(name: "Caprese Salad", photo: photo1, rating: 5) else {
-        //            fatalError("Unable to instantiate meal1")
-        //        }
-        //
-        //        guard let meal2 = Meal(name: "Spaghetti and Meatballs", photo: photo2, rating: 4) else {
-        //            fatalError("Unable to instantiate meal2")
-        //        }
-        //
-        //        guard let meal3 = Meal(name: "Pizza", photo: photo3, rating: 3) else {
-        //            fatalError("Unable to instantiate meal2")
-        //        }
-        //
-        //        meals += [meal1, meal2, meal3]
-        //    }
-        
-        private func saveMeals() {
-            // old code before saving to server
-            //        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(meals, toFile: Meal.ArchiveURL.path)
-            //        if isSuccessfulSave {
-            //            os_log("Meals successfully saved.", log: OSLog.default, type: .debug)
-            //        } else {
-            //            os_log("Failed to save meals...", log: OSLog.default, type: .error)
-            //        }
+    }
+    
+    // Override to support conditional editing of the table view.
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the specified item to be editable.
+        return true
+    }
+    
+    //MARK: Private Methods
+    
+    private func loadMeals() {
+        networkManager.fetchAllMeals { (meals) in
+            if meals != nil {
+                self.meals = meals!
+            }
+            self.tableView.reloadData()
         }
-        
-        private func loadMeals() -> [Meal]?  {
-            return NSKeyedUnarchiver.unarchiveObject(withFile: Meal.ArchiveURL.path) as? [Meal]
-        }
-        
-        //MARK: Actions
-        
-        @IBAction func unwindToMealList(sender: UIStoryboardSegue) {
-            if let sourceViewController = sender.source as? MealViewController, let meal = sourceViewController.meal {
-                if let selectedIndexPath = tableView.indexPathForSelectedRow {
-                    // Update an existing meal.
-                    meals[selectedIndexPath.row] = meal
-                    tableView.reloadRows(at: [selectedIndexPath], with: .none)
-                } else {
-                    // Add a new meal.
-                    //let newIndexPath = IndexPath(row: 1, section: 0)
-                    //meals.append(meal)
-                    networkManager.saveMeal(meal: meal)
-                    tableView.reloadData()
-                    //tableView.insertRows(at: [newIndexPath], with: .automatic)                     //NSInternalInconsistencyException', reason: 'attempt to insert row 2 into section 0, but there are only 2 rows in section 0 after the update'
+    }
 
-                    
-                }
-                // Save the meals.
+    @IBAction func unwindToMealList(sender: UIStoryboardSegue) {
+        if let sourceViewController = sender.source as? MealViewController, let meal = sourceViewController.meal {
+            if let selectedIndexPath = tableView.indexPathForSelectedRow {
+                // Update an existing meal. (when save is hit)
+                meals[selectedIndexPath.row] = meal
+                tableView.reloadRows(at: [selectedIndexPath], with: .none)
+            } else {
+                networkManager.saveMeal(meal: meal)
+                tableView.reloadData()
             }
         }
-        
+    }
+    
 }

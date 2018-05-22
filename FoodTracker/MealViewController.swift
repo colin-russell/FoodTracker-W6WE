@@ -125,9 +125,10 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         let rating = ratingControl.rating
         let calories = Int(caloriesTextField.text ?? "") ?? 0
         let mealDescription = descriptionTextField.text ?? ""
+        let id = 0 // NEED TO CHANGE LATER
         
         // Set the meal to be passed to MealTableViewController after the unwind segue.
-        meal = Meal(name: name, photo: photo, rating: rating, calories: calories, mealDescription: mealDescription)
+        meal = Meal(name: name, photo: photo, rating: rating, calories: calories, mealDescription: mealDescription, id: id)
     }
     
     //MARK: Actions
