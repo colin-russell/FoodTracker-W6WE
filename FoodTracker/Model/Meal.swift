@@ -8,16 +8,17 @@
 
 import UIKit
 import os.log
+import Parse
 
-class Meal: NSObject, NSCoding {
+class Meal:  PFObject, NSCoding { // Meal: NSObject, NSCoding
     
     //MARK: Properties
-    var name: String
-    var photo: UIImage?
-    var rating: Int
-    var calories: Int
-    var mealDescription: String
-    var id: Int
+    @NSManaged var name: String
+    @NSManaged var photo: UIImage?
+    @NSManaged var rating: Int
+    @NSManaged var calories: Int
+    @NSManaged var mealDescription: String
+    @NSManaged var id: Int
     
     //MARK: Archiving Paths
     
@@ -37,6 +38,8 @@ class Meal: NSObject, NSCoding {
     
     //MARK: Initialization
     init?(name: String, photo: UIImage?, rating: Int, calories: Int, mealDescription: String, id: Int) {
+        super.init()
+        
         // The name must not be empty
         guard !name.isEmpty else {
             return nil
@@ -46,7 +49,7 @@ class Meal: NSObject, NSCoding {
         guard (rating >= 0) && (rating <= 5) else {
             return nil
         }
-
+        
         self.name = name
         self.photo = photo
         self.rating = rating
@@ -87,6 +90,15 @@ class Meal: NSObject, NSCoding {
         // Must call designated initializer.
         self.init(name: name, photo: photo, rating: rating, calories: calories, mealDescription: mealDescription, id: id)
         
+    }
+    
+}
+
+extension Meal: PFSubclassing {
+    
+    // required
+    static func parseClassName() -> String {
+        return "Meal"
     }
     
 }

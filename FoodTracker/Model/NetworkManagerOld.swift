@@ -10,7 +10,7 @@ import UIKit
 import Foundation
 
 // Probably should have methods to be reused for GET, POST, etc.
-class NetworkManager {
+class NetworkManagerOld {
     
     //MARK: Properties
     var username = "colin123"
@@ -53,7 +53,7 @@ class NetworkManager {
                 let mealID = results["meal"]?["id"] ?? ""
                 request.url = URL(string: "https://cloud-tracker.herokuapp.com/users/me/meals/\(mealID)/rate?rating=\(mealRating)")
                 let ratingSession = URLSession(configuration: URLSessionConfiguration.default)
-                
+
                 let ratingTask = ratingSession.dataTask(with: request, completionHandler: { (_, ratingResponse, ratingError) in
                     if (ratingError == nil) {
                         let statusCode = (ratingResponse as! HTTPURLResponse).statusCode
@@ -70,11 +70,7 @@ class NetworkManager {
         task.resume()
         session.finishTasksAndInvalidate()
     }
-    
-    func updateRating(meal: Meal) {
-        
-    }
-    
+   
     func deleteMeal(meal: Meal, id: Int) {
         
         httpMethod = "DELETE"
@@ -145,6 +141,10 @@ class NetworkManager {
         })
         task.resume()
         session.finishTasksAndInvalidate()
+    }
+    
+    func postToImgur(completion: @escaping (_ photoUrl: String) -> Void) {
+        
     }
     
 }

@@ -90,7 +90,6 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
        
         // Dismiss the picker.
         dismiss(animated: true, completion: nil)
-
         
     }
     

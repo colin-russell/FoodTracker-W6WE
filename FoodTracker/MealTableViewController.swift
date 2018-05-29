@@ -95,7 +95,7 @@ class MealTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             networkManager.deleteMeal(meal: meals[indexPath.row], id: meals[indexPath.row].id)
-           loadMeals()
+            loadMeals()
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -114,19 +114,23 @@ class MealTableViewController: UITableViewController {
             if meals != nil {
                 self.meals = meals!
             }
-            for i in 0..<meals!.count {
+            let mealCount = meals?.count ?? 0
+            for i in 0..<mealCount {
                 print("rating: \(self.meals[i].rating)")
             }
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
-
+    
     @IBAction func unwindToMealList(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? MealViewController, let meal = sourceViewController.meal {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 // Update an existing meal. (when save is hit)
-                meals[selectedIndexPath.row] = meal
-                tableView.reloadRows(at: [selectedIndexPath], with: .none)
+                
+                //                meals[selectedIndexPath.row] = meal
+                //                tableView.reloadRows(at: [selectedIndexPath], with: .none)
             } else {
                 networkManager.saveMeal(meal: meal)
                 
